@@ -1,0 +1,6 @@
+Usage: eduadmin [Options] [Command args ...]
+Options:
+    -h, --help
+        Print this help message.
+    -v, --version
+        Print version information.

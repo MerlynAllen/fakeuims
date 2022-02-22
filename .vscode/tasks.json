@@ -4,7 +4,7 @@
       {
         "type": "shell",
         "label": "make",
-        "command": "make",
+        "command": "make clean && make",
         // "args": ["-g", "${file}", "-o", "${fileDirname}/${fileBasenameNoExtension}"],
         // "options": {
         //   "cwd": "/usr/bin"
@@ -19,7 +19,7 @@
       {
         "type": "shell",
         "label": "make-debug",
-        "command": "make debug",
+        "command": "make clean && make debug",
         // "args": ["-g", "${file}", "-o", "${fileDirname}/${fileBasenameNoExtension}"],
         // "options": {
         //   "cwd": "/usr/bin"
