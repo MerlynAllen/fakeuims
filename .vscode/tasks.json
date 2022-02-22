@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "type": "shell",
+        "label": "make",
+        "command": "make",
+        // "args": ["-g", "${file}", "-o", "${fileDirname}/${fileBasenameNoExtension}"],
+        // "options": {
+        //   "cwd": "/usr/bin"
+        // },
+        "problemMatcher": ["$gcc"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+
+      {
+        "type": "shell",
+        "label": "make-debug",
+        "command": "make debug",
+        // "args": ["-g", "${file}", "-o", "${fileDirname}/${fileBasenameNoExtension}"],
+        // "options": {
+        //   "cwd": "/usr/bin"
+        // },
+        "problemMatcher": ["$gcc"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      }
+    ]
+  }
