@@ -7,11 +7,8 @@
 #include <stdint.h>
 
 #include "parser.h"
-
-static char USERNAME[MAX_LEN] = {0};
-static uint32_t USERID = 0;
-extern uint8_t _binary_HELP_end;
-extern uint8_t _binary_HELP_start;
+#include "login.h"
+#include "globals.h"
 
 int printMOTD()
 {
@@ -47,10 +44,21 @@ int interactiveShell()
             if (strcmp(argv[0], "login") == 0)
             {
                 // login
+                login();
             }
             else if (strcmp(argv[0], "help") == 0)
             {
-                return printHelp();
+                printHelp();
+            }
+            else if (strcmp(argv[0], "quit") == 0)
+            {
+                printf("Bye!\n");
+                return 0;
+            }
+            else
+            {
+                printf("Unknown command: %s\n", argv[0]);
+                printHelp();
             }
         }
     }

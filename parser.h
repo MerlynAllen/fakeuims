@@ -15,7 +15,8 @@
 #define WHITESPACE " \t\n\r\0"
 #define SPACE " \t"
 
+bool isChars(char c, char *chars);
 int readline(char *str, int maxlen);
-int parseArgs(char *argv[MAX
+int parseArgs(char *argv[MAX_ARGC], char *str);
 
-#endif_ARGC], char *str);
+#endif
