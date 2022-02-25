@@ -1,13 +1,12 @@
 #ifndef LOGIN
 #define LOGIN
 #include "globals.h"
+#include "limits.h"
 typedef struct UserInfo
 {
     char username[MAX_LEN];
     uint32_t userid;
     uint8_t hash[MD5_LEN];
-    UserInfo *next;
-    UserInfo *prev;
 } UserInfo;
 
 typedef enum UserType
@@ -18,9 +17,17 @@ typedef enum UserType
     TEACHER    // 0x80000001-0xFFFFFFFF
 } UserType;
 
-int login();
-int checkLogin(char *username, char *password);
+// int login();
+// int checkLogin(char *username, char *password);
 
-int createLogin();
-int createUser(char *username, char *password);
+// int createLogin();
+// int createUser(char *username, char *password);
+int initUserProfile();
+int getUserInfo();
+int login();
+int loginHash(char *username, char *password, char hash[MD5_LEN]);
+int createAdmin();
+int createUser();
+void fillUserInfo(UserInfo *user, char *name, uint32_t uid, uint8_t hash[MD5_LEN]);
+int saveLoginInfo();
 #endif

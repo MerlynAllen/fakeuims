@@ -2,6 +2,7 @@
     "files.associations": {
         "ctype.h": "c",
         "md5.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "limits.h": "c"
     }
 }

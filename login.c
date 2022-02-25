@@ -8,70 +8,100 @@
 
 #include "lnklist.h"
 
-bool isTeacher(userid)
+bool isTeacher(uint32_t userid)
 {
     return (userid & 0x80000000) >> 31;
 }
-bool isStudent(userid)
+bool isStudent(uint32_t userid)
 {
     return !isTeacher(userid);
 }
-bool isAdmin(userid)
-{
-    return (userid & 0x40000000) >> 30;
-}
-bool isRoot(userid)
+bool isRoot(uint32_t userid)
 {
     return userid == 1;
 }
-bool isAnonymous(userid)
+bool isAdmin(uint32_t userid)
+{
+    return ((userid & 0x40000000) >> 30) || isRoot(userid);
+}
+bool isAnonymous(uint32_t userid)
 {
     return userid == 0;
 }
 
-int touchUserPasswd()
+int initUserProfile() // no login info, init
 {
-    FILE *fp = fopen("user", "w");
-    if (fp == NULL)
+    while (1)
     {
-        printf("Cannot create user profile.\n");
-        return -1;
+        printf("Creating user profile...\n");
+        UserInfo *root = calloc(1, sizeof(UserInfo));
+        root->userid = 1;
+        strcpy(root->username, "root");
+        char root_passwd[MAX_LEN] = {0};
+        char root_passwd_confirm[MAX_LEN] = {0};
+        printf("Please input root password: ");
+        readline(root_passwd, MAX_LEN);
+        printf("Please confirm root password again: ");
+        readline(root_passwd_confirm, MAX_LEN);
+        if (strcmp(root_passwd, root_passwd_confirm) != 0)
+        {
+            printf("Password not match.\n");
+            free(root);
+            continue;
+        }
+        uint8_t md5sum[MD5_LEN] = {0};
+        loginHash(root->username, root_passwd, md5sum);
+        memcpy(root->hash, md5sum, MD5_LEN);
+
+        UserInfo *anonymous = calloc(1, sizeof(UserInfo));
+        strcpy(anonymous->username, "anonymous");
+        USERLIST = dnodeInit(anonymous);
+
+        appendNode(USERLIST, root);
+        break;
+
+        // FILE *fp = fopen("passwd", "w");
+        // if (fp == NULL)
+        // {
+        //     printf("Cannot create passwd profile. Filesystem error.\n");
+        //     exit(1);
+        // }
+        // fwrite(&(uint32_t){2}, sizeof(uint32_t), 1, fp);
+        // fclose(fp);
     }
-    fclose(fp);
-    FILE *fp = fopen("passwd", "w");
-    if (fp == NULL)
-    {
-        printf("Cannot create passwd profile.\n");
-        return -1;
-    }
-    fwrite(&(uint32_t){0}, sizeof(uint32_t), 1, fp);
-    fclose(fp);
 }
 
 int getUserInfo()
 {
-    FILE *fp_usr = fopen("users", "r");
-    if (fp_usr == NULL)
-    {
-        printf("Failed to open users file.\n");
-        return -1;
-    }
-    char username[MAX_LEN] = {0};
-    char userID[MAX_LEN] = {0};
-    fscanf(fp_usr, "%s:%s", username, userID);
-}
-int getPasswdInfo() // get password info form file
-{
     FILE *fp_pwd = fopen("passwd", "r");
     if (fp_pwd == NULL)
     {
-        printf("Failed to open passwd file.\n");
+        printf("Failed to open passwd file. File might be missing.\n");
         return -1;
     }
-    char username[MAX_LEN] = {0};
-    char passwd[MAX_LEN] = {0};
-    fscanf(fp_pwd, "%s:%s", username, passwd);
-    //
+    // initialize a new linked list
+
+    uint32_t user_count = 0;
+    fread(&user_count, sizeof(uint32_t), 1, fp_pwd);
+
+    for (int i = 0; i < user_count; ++i)
+    {
+        UserInfo *data = calloc(1, sizeof(UserInfo));
+        if (fread(data, sizeof(UserInfo), 1, fp_pwd) != 1)
+        {
+            printf("Failed to read user info. File might be corrupted.\n");
+            return -1;
+        }
+        if (USERLIST == NULL)
+        {
+            USERLIST = dnodeInit(data);
+        }
+        else
+        {
+            appendNode(USERLIST, data);
+        }
+    }
+    return 0;
 }
 
 int login() // main login function
@@ -108,15 +138,66 @@ int loginHash(char *username, char *password, char hash[MD5_LEN]) // generates m
     // printf("\n");
 }
 
+bool usernameMatch(void *data, void *username)
+{
+    if (strcmp((char *)username, ((UserInfo *)data)->username) == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 int checkLogin(char *username, char *password)
 {
     FILE *passwd;
-    FILE *users;
     fopen("passwd", "r");
-    fopen("users", "r");
     char buf[MAX_LEN] = {0};
     loginHash(username, password, buf);
+    seekNode(USERLIST, usernameMatch, username);
+    UserInfo *sel_user = (UserInfo *)USERLIST->ptr->data;
+    if (memcmp(buf, sel_user->hash, MD5_LEN) == 0)
+    {
+        printf("Login success!\n");
+        USERID = sel_user->userid;
+        strcpy(USERNAME, sel_user->username);
+        return 0;
+    }
+    else
+    {
+        printf("Login failed!\n");
+        return -1;
+    }
     //
+}
+void fillUserInfo(UserInfo *user, char *name, uint32_t uid, uint8_t hash[MD5_LEN])
+{
+    strcpy(user->username, name);
+    user->userid = uid;
+    memcpy(user->hash, hash, MD5_LEN);
+}
+int createLogin(char *username, char *password, uint32_t uid) // avability check passed, add user to linked list (RAM bot not file)
+{
+    char md5sum[MD5_LEN] = {0};
+    loginHash(username, password, md5sum);
+    UserInfo *data = calloc(1, sizeof(UserInfo)); // empty
+    fillUserInfo(data, username, uid, md5sum);
+    appendNode(USERLIST, data);
+    return 0;
+}
+
+bool checkDuplicate(char *username)
+{
+    if (seekNode(USERLIST, usernameMatch, username) == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 int createAccount(bool admin)
@@ -146,6 +227,11 @@ int createAccount(bool admin)
                 goto retry;
             }
         }
+        if (checkDuplicate(username))
+        {
+            printf("Username already exists.\n");
+            return 0;
+        }
         // Username passed
         printf("Password: ");
         readline(password, MAX_LEN);
@@ -174,12 +260,12 @@ int createAccount(bool admin)
         printf("Account type Teacher/Student [T/S]: ");
         char type[MAX_LEN] = {0};
         readline(type, MAX_LEN);
-        if (strcmp(type, "S"))
+        if (strcmp(type, "S") == 0)
         {
             is_student = true;
             printf("Student ID: ");
         }
-        else if (strcmp(type, "T"))
+        else if (strcmp(type, "T") == 0)
         {
             is_student = false;
             printf("Teacher ID: ");
@@ -195,6 +281,8 @@ int createAccount(bool admin)
         printf("Creating user...\n");
         uid = (sub_id & 0x0FFFFFFF) | (is_student << 31) | (admin << 30);
         createLogin(username, password, uid);
+        printf("User created!\n");
+        return 0;
     // retry
     retry:
         printf("Retry? [Y/N]\n");
@@ -228,42 +316,26 @@ int createUser()
     createAccount(false);
 }
 
-int createLogin(char *username, char *password, uint32_t uid) // avability passed, add user to linked list (RAM bot not file)
-{
-    char md5sum[MD5_LEN] = {0};
-    loginHash(username, password, md5sum);
-
-    // US
-    // fwrite(&uid, sizeof(uint32_t), 1, fp_pwd);
-    // fwrite(checksum, sizeof(uint8_t), MD5_LEN, fp_pwd);
-    // freopen("passwd", "rb+", fp_pwd);
-    // USERCOUNT++;
-    // fwrite(&USERCOUNT, sizeof(uint32_t), 1, fp_pwd);
-    // fclose(fp_pwd);
-}
-
 int saveLoginInfo() // save to a new file
 {
-    FILE *fp_usr = fopen("users", "wb");
     FILE *fp_pwd = fopen("passwd", "wb");
-    if (fp_usr == NULL)
-    {
-        printf("Failed to open users  file.\n");
-        return -1;
-    }
     if (fp_pwd == NULL)
     {
-        printf("Password file missing, try creating new\n");
-        fp_pwd = fopen("passwd", "wb");
-        if (fp_pwd == NULL)
-        {
-            printf("Failed to create password file.\n");
-            return -1;
-        }
-        //
-        // saving current user info;
-        // fwrite();
+        printf("Failed to create password file.\n");
+        return -1;
     }
-    fclose(fp_usr);
+
+    // saving current user info;
+    DNode *curr = USERLIST->ptr;
+    fwrite(&USERLIST->count, sizeof(uint32_t), 1, fp_pwd);
+    USERLIST->ptr = USERLIST->head;
+    for (; USERLIST->ptr != NULL; USERLIST->ptr = USERLIST->ptr->next)
+    {
+        UserInfo *data = (UserInfo *)USERLIST->ptr->data;
+        fwrite(USERLIST->ptr->data, sizeof(UserInfo), 1, fp_pwd);
+    }
+    // fwrite();
+
+    USERLIST->ptr = curr;
     fclose(fp_pwd);
 }

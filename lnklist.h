@@ -1,12 +1,16 @@
 #ifndef LNKLIST
 #define LNKLIST
-#include "stdint.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct DNode
 {
     void *data;
-    DNode *next;
-    DNode *prev;
+    struct DNode *next;
+    struct DNode *prev;
 } DNode;
 
 typedef struct DLnklist
@@ -17,10 +21,12 @@ typedef struct DLnklist
     uint32_t count;
 } DLnklist;
 
-DLnklist *dnodeInit(void (*makeData)(void **));
-int appendNode(DLnklist *ll, void (*makeData)(void **));
-int insNode(DLnklist *ll, void (*makeData)(void **)); // insert after ptr
-int insHeadNode(DLnklist *ll, void (*makeData)(void **));
+DLnklist *dnodeInit(void *data);
+int appendNode(DLnklist *ll, void *data);
+int insNode(DLnklist *ll, void *data); // insert after ptr
+int insHeadNode(DLnklist *ll, void *data);
 int delNode(DLnklist *ll);
-int seekNode(DLnklist *ll, bool (*criterion)(void *))
+int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data);
+DLnklist *dnodeInit(void *data);
+int clearList(DLnklist *ll);
 #endif

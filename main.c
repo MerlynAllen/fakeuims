@@ -5,6 +5,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 #include "parser.h"
 #include "login.h"
@@ -25,9 +26,33 @@ int printHelp()
     putchar('\n');
     return 0;
 }
+
+bool checkArgs(char *arg, int argc, ...)
+{
+    va_list ap;
+    va_start(ap, argc);
+    // printf("checking arg for input %s\n", arg);
+    for (int i = 0; i < argc; ++i)
+    {
+        if (strcmp(arg, va_arg(ap, char *)) == 0)
+        {
+            va_end(ap);
+            return true;
+        }
+    }
+    va_end(ap);
+    return false;
+}
+
 int interactiveShell()
 {
+
     strcpy(USERNAME, "anonymous");
+    // init userlist
+    if (getUserInfo() == -1)
+    {
+        initUserProfile();
+    }
     while (true)
     {
         printf("[%s]> ", USERNAME);
@@ -41,19 +66,27 @@ int interactiveShell()
         {
             char *argv[MAX_ARGC] = {0};
             int argc = parseArgs(argv, cmd);
-            if (strcmp(argv[0], "login") == 0)
+            if (checkArgs(argv[0], 1, "login"))
             {
                 // login
                 login();
             }
-            else if (strcmp(argv[0], "help") == 0)
+            else if (checkArgs(argv[0], 2, "help", "?"))
             {
                 printHelp();
             }
-            else if (strcmp(argv[0], "quit") == 0)
+            else if (checkArgs(argv[0], 2, "quit", "exit"))
             {
                 printf("Bye!\n");
-                return 0;
+                break;
+            }
+            else if (checkArgs(argv[0], 1, "adduser"))
+            {
+                createUser();
+            }
+            else if (checkArgs(argv[0], 1, "addadmin"))
+            {
+                createAdmin();
             }
             else
             {
@@ -62,11 +95,16 @@ int interactiveShell()
             }
         }
     }
+    saveLoginInfo();
+    clearList(USERLIST);
+    USERLIST = NULL;
     return 0;
 }
 
 int main(int argc, char *argv[MAX_ARGC])
 {
+    // init global vars
+
     printMOTD();
     if (argc == 1) // No args, redir to -i
     {

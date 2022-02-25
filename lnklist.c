@@ -1,37 +1,35 @@
 /*
 Dual Linked List
 */
-#include <stdbool.h>
 #include "lnklist.h"
-#define NULL 0
 
-DLnklist *dnodeInit(void (*makeData)(void **))
+DLnklist *dnodeInit(void *data)
 {
     DNode *head = calloc(1, sizeof(DNode));
-    makeData(&head->data);
+    head->data = data;
     head->next = NULL;
     head->prev = NULL;
     DLnklist *dlist = calloc(1, sizeof(DLnklist));
     dlist->head = head;
     dlist->tail = head;
     dlist->ptr = head;
-    dlist->count = 0;
+    dlist->count = 1;
     return dlist;
 }
 
-int appendNode(DLnklist *ll, void (*makeData)(void **))
+int appendNode(DLnklist *ll, void *data)
 {
     DNode *tmp = ll->ptr;
     ll->ptr = ll->tail;
-    insNode(ll, makeData);
+    insNode(ll, data);
     ll->ptr = tmp;
     return ll->count;
 }
 
-int insNode(DLnklist *ll, void (*makeData)(void **)) // insert after ptr
+int insNode(DLnklist *ll, void *data) // insert after ptr
 {
     DNode *node = calloc(1, sizeof(DNode));
-    makeData(&node->data);
+    node->data = data; // for other functions to fill in
     node->next = ll->ptr->next;
     node->prev = ll->ptr;
     if (ll->ptr != ll->tail)
@@ -47,12 +45,11 @@ int insNode(DLnklist *ll, void (*makeData)(void **)) // insert after ptr
     ll->count++;
     return ll->count;
 }
-int insHeadNode(DLnklist *ll, void (*makeData)(void **))
+int insHeadNode(DLnklist *ll, void *data)
 {
 
     DNode *node = calloc(1, sizeof(DNode));
-    makeData(&node->data);
-
+    node->data = data;
     node->prev = NULL;
     node->next = ll->head;
     ll->head->prev = node;
@@ -79,16 +76,34 @@ int delNode(DLnklist *ll)
     ll->ptr = next;
 }
 
-int seekNode(DLnklist *ll, bool (*criterion)(void *))
+int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data)
 {
     ll->ptr = ll->head;
-    for (; criterion(ll->ptr->data); ll->ptr = ll->ptr->next)
+    for (; !criterion(ll->ptr->data, data); ll->ptr = ll->ptr->next)
     {
-        if (ll->ptr == ll->tail)
+        if (ll->ptr == ll->tail) // end of list
         {
             return -1;
         }
     }
+    return 0;
+}
+
+int clearList(DLnklist *ll)
+{
+    DNode *tmp = ll->head;
+    while (tmp != NULL)
+    {
+        DNode *next = tmp->next;
+        free(tmp->data);
+        free(tmp);
+        tmp = next;
+    }
+    ll->head = NULL;
+    ll->tail = NULL;
+    ll->ptr = NULL;
+    ll->count = 0;
+    free(ll);
     return 0;
 }
 
