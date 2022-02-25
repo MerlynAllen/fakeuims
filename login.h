@@ -1,15 +1,14 @@
 #ifndef LOGIN
 #define LOGIN
-
-typedef UserInfo
+#include "globals.h"
+typedef struct UserInfo
 {
     char username[MAX_LEN];
     uint32_t userid;
     uint8_t hash[MD5_LEN];
     UserInfo *next;
     UserInfo *prev;
-}
-UserInfo;
+} UserInfo;
 
 typedef enum UserType
 {

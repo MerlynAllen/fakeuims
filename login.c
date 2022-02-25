@@ -3,63 +3,10 @@
 #include "md5.h"
 #include "globals.h"
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
-UserInfo *userInit()
-{
-    head = calloc(1, sizeof(UserInfo));
-    head->next = NULL;
-    head->prev = NULL;
-    USER_HEAD = head;
-    USER_TAIL = head;
-    USER_PTR = head;
-    return head;
-}
-
-UserInfo *makeUser(char *username, uint32_t userid, char hash[MD5_LEN])
-{
-    UserInfo *user = calloc(1, sizeof(UserInfo));
-    strcpy(user->username, username);
-    user->userid = userid;
-    memcpy(user->hash, hash, 16);
-    user->next = NULL;
-    user->prev = NULL;
-    return user;
-}
-
-void appendUser(UserInfo *user)
-{
-    UserInfo *tmp = USER_PTR;
-    USER_PTR = USER_TAIL;
-    insUser(user, false);
-}
-
-void seekUser(UserInfo)
-{
-}
-
-void insUser(UserInfo *user, bool reverse)
-{
-    if (!reverse)
-    {
-        user->next = USER_PTR->next;
-        user->prev = USER_PTR;
-        if (USER_PTR->next != NULL)
-        {
-            USER_PTR->next->prev = user;
-        }
-        USER_PTR->next = user;
-    }
-    else
-    {
-        user->prev = USER_PTR->prev;
-        user->next = USER_PTR;
-        if (USER_PTR->prev != NULL)
-        {
-            USER_PTR->prev->next = user;
-        }
-        USER_PTR->prev = user;
-    }
-}
+#include "lnklist.h"
 
 bool isTeacher(userid)
 {
@@ -82,7 +29,26 @@ bool isAnonymous(userid)
     return userid == 0;
 }
 
-getUserInfo()
+int touchUserPasswd()
+{
+    FILE *fp = fopen("user", "w");
+    if (fp == NULL)
+    {
+        printf("Cannot create user profile.\n");
+        return -1;
+    }
+    fclose(fp);
+    FILE *fp = fopen("passwd", "w");
+    if (fp == NULL)
+    {
+        printf("Cannot create passwd profile.\n");
+        return -1;
+    }
+    fwrite(&(uint32_t){0}, sizeof(uint32_t), 1, fp);
+    fclose(fp);
+}
+
+int getUserInfo()
 {
     FILE *fp_usr = fopen("users", "r");
     if (fp_usr == NULL)
@@ -94,7 +60,7 @@ getUserInfo()
     char userID[MAX_LEN] = {0};
     fscanf(fp_usr, "%s:%s", username, userID);
 }
-int getPasswdInfo()
+int getPasswdInfo() // get password info form file
 {
     FILE *fp_pwd = fopen("passwd", "r");
     if (fp_pwd == NULL)
@@ -105,9 +71,10 @@ int getPasswdInfo()
     char username[MAX_LEN] = {0};
     char passwd[MAX_LEN] = {0};
     fscanf(fp_pwd, "%s:%s", username, passwd);
+    //
 }
 
-int login()
+int login() // main login function
 {
     int fail_count = 0;
     printf("Username: ");
@@ -124,16 +91,16 @@ int login()
     checkLogin(username, password);
 }
 
-int loginHash(char *username, char *password, char *hash)
+int loginHash(char *username, char *password, char hash[MD5_LEN]) // generates md5 from username and password
 {
     int un_len, pw_len = 0;
     un_len = strlen(username);
     pw_len = strlen(password);
+    uint8_t buf[MD5_LEN] = {0};
     strcpy(buf, username);
     strcpy(buf + un_len, ":");
     strcpy(buf + un_len + 1, password);
-    uint8_t checksum[MD5_LEN] = {0};
-    md5(buf, strlen(buf), checksum);
+    md5(buf, strlen(buf), hash);
     // for (int i = 0; i < 16; i++)
     // {
     //     printf("%02x ", checksum[i]);
@@ -170,8 +137,7 @@ int createAccount(bool admin)
             printf("Username must be between 5 and 20 characters.\n");
             goto retry;
         }
-        for (i = 0; i < strlen(username), ALNUM)
-            ; i++)
+        for (i = 0; i < strlen(username); i++)
         {
             if (!isChars(username[i], ALNUM))
             {
@@ -195,8 +161,7 @@ int createAccount(bool admin)
             printf("Password must be between 5 and 20 characters.\n");
             goto retry;
         }
-        for (i = 0; i < strlen(password), ALNUM)
-            ; i++)
+        for (i = 0; i < strlen(password); i++)
         {
             if (!isChars(password[i], ALNUM))
             {
@@ -214,7 +179,7 @@ int createAccount(bool admin)
             is_student = true;
             printf("Student ID: ");
         }
-        else if strcmp (type, "T")
+        else if (strcmp(type, "T"))
         {
             is_student = false;
             printf("Teacher ID: ");
@@ -263,43 +228,18 @@ int createUser()
     createAccount(false);
 }
 
-int createLogin(char *username, char *password, uint32_t uid)
+int createLogin(char *username, char *password, uint32_t uid) // avability passed, add user to linked list (RAM bot not file)
 {
-    FILE *fp_usr = fopen("users", "a");
-    FILE *fp_pwd = fopen("passwd", "ab");
-    if (fp_usr == NULL)
-    {
-        printf("Failed to open users  file.\n");
-        return -1;
-    }
-    if (fp_pwd == NULL)
-    {
-        printf("Password file missing, try creating new\n");
-        fp_pwd = fopen("passwd", "wb");
-        if (fp_pwd == NULL)
-        {
-            printf("Failed to create password file.\n");
-            return -1;
-        }
-        //
-        // saving current user info;
-        fwrite();
-    }
-    fprintf(fp_usr, "%s:%d\n", username, uid);
-    fclose(fp_usr);
+    char md5sum[MD5_LEN] = {0};
+    loginHash(username, password, md5sum);
 
-    char buf[MAX_LEN] = {0};
-    strcpy(buf, username);
-    strcpy(buf + strlen(username), ":");
-    strcpy(buf + strlen(username) + 1, password);
-    uint8_t checksum[MD5_LEN] = {0};
-    md5(buf, strlen(buf), checksum);
-    fwrite(&uid, sizeof(uint32_t), 1, fp_pwd);
-    fwrite(checksum, sizeof(uint8_t), MD5_LEN, fp_pwd);
-    freopen("passwd", "rb+", fp_pwd);
-    USERCOUNT++;
-    fwrite(&USERCOUNT, sizeof(uint32_t), 1, fp_pwd);
-    fclose(fp_pwd);
+    // US
+    // fwrite(&uid, sizeof(uint32_t), 1, fp_pwd);
+    // fwrite(checksum, sizeof(uint8_t), MD5_LEN, fp_pwd);
+    // freopen("passwd", "rb+", fp_pwd);
+    // USERCOUNT++;
+    // fwrite(&USERCOUNT, sizeof(uint32_t), 1, fp_pwd);
+    // fclose(fp_pwd);
 }
 
 int saveLoginInfo() // save to a new file
@@ -322,7 +262,7 @@ int saveLoginInfo() // save to a new file
         }
         //
         // saving current user info;
-        fwrite();
+        // fwrite();
     }
     fclose(fp_usr);
     fclose(fp_pwd);
