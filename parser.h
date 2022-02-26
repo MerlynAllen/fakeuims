@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "limits.h"
+#include "globals.h"
 
 #define ALNUM "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 #define ALNUMOPER \
@@ -18,5 +19,5 @@
 bool isChars(char c, char *chars);
 int readline(char *str, int maxlen);
 int parseArgs(char *argv[MAX_ARGC], char *str);
-
+int terminate(int errno);
 #endif

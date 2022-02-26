@@ -21,12 +21,15 @@ typedef struct DLnklist
     uint32_t count;
 } DLnklist;
 
-DLnklist *dnodeInit(void *data);
+DLnklist *makeDLinkedList();
+int initDLinkedList(DLnklist *dlist);
+
 int appendNode(DLnklist *ll, void *data);
 int insNode(DLnklist *ll, void *data); // insert after ptr
 int insHeadNode(DLnklist *ll, void *data);
+int moveNext(DLnklist *ll);
 int delNode(DLnklist *ll);
 int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data);
-DLnklist *dnodeInit(void *data);
+
 int clearList(DLnklist *ll);
 #endif

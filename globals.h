@@ -13,4 +13,11 @@ extern uint8_t _binary_HELP_start;
 
 DLnklist *USERLIST;
 
+DLnklist *TEACHERS;
+DLnklist *STUDENTS;
+DLnklist *ENROLLMENTS;
+DLnklist *COURSES;
+DLnklist *ROOMS;
+DLnklist *REGISTRYS;
+
 #endif

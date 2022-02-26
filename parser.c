@@ -45,6 +45,14 @@ int parseArgs(char *argv[MAX_ARGC], char *str)
     return argc;
 }
 
+int terminate(int errno)
+{
+    saveLoginInfo();
+    clearList(USERLIST);
+    USERLIST = NULL;
+    exit(errno);
+}
+
 int readline(char *str, int maxlen)
 {
     int len = 0;
@@ -52,6 +60,10 @@ int readline(char *str, int maxlen)
     while (len < maxlen - 1 && (c = getchar()) != '\n' && c != EOF)
     {
         str[len++] = c;
+    }
+    if (c == EOF)
+    {
+        terminate(0);
     }
     str[len] = '\0';
     return len;

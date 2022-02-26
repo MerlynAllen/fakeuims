@@ -1,12 +1,4 @@
 #include "login.h"
-#include "parser.h"
-#include "md5.h"
-#include "globals.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "lnklist.h"
 
 bool isTeacher(uint32_t userid)
 {
@@ -27,6 +19,10 @@ bool isAdmin(uint32_t userid)
 bool isAnonymous(uint32_t userid)
 {
     return userid == 0;
+}
+uint32_t uid2subid(uint32_t uid)
+{
+    return uid & 0x0FFFFFFF;
 }
 
 int initUserProfile() // no login info, init
@@ -52,10 +48,10 @@ int initUserProfile() // no login info, init
         uint8_t md5sum[MD5_LEN] = {0};
         loginHash(root->username, root_passwd, md5sum);
         memcpy(root->hash, md5sum, MD5_LEN);
-
+        USERLIST = makeDLinkedList();
         UserInfo *anonymous = calloc(1, sizeof(UserInfo));
         strcpy(anonymous->username, "anonymous");
-        USERLIST = dnodeInit(anonymous);
+        appendNode(USERLIST, anonymous);
 
         appendNode(USERLIST, root);
         break;
@@ -81,6 +77,7 @@ int getUserInfo()
     }
     // initialize a new linked list
 
+    USERLIST = makeDLinkedList();
     uint32_t user_count = 0;
     fread(&user_count, sizeof(uint32_t), 1, fp_pwd);
 
@@ -92,14 +89,15 @@ int getUserInfo()
             printf("Failed to read user info. File might be corrupted.\n");
             return -1;
         }
-        if (USERLIST == NULL)
+        if (isStudent(data->userid))
         {
-            USERLIST = dnodeInit(data);
+            addStudent(data->username, uid2subid(data->userid));
         }
         else
         {
-            appendNode(USERLIST, data);
+            addTeacher(data->username, uid2subid(data->userid));
         }
+        appendNode(USERLIST, data);
     }
     return 0;
 }
@@ -280,6 +278,14 @@ int createAccount(bool admin)
             ;
         printf("Creating user...\n");
         uid = (sub_id & 0x0FFFFFFF) | (is_student << 31) | (admin << 30);
+        if (is_student)
+        {
+            addStudent(username, sub_id);
+        }
+        else
+        {
+            addTeacher(username, sub_id);
+        }
         createLogin(username, password, uid);
         printf("User created!\n");
         return 0;

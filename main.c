@@ -49,6 +49,7 @@ int interactiveShell()
 
     strcpy(USERNAME, "anonymous");
     // init userlist
+    initData();
     if (getUserInfo() == -1)
     {
         initUserProfile();
@@ -95,10 +96,7 @@ int interactiveShell()
             }
         }
     }
-    saveLoginInfo();
-    clearList(USERLIST);
-    USERLIST = NULL;
-    return 0;
+    terminate(0);
 }
 
 int main(int argc, char *argv[MAX_ARGC])

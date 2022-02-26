@@ -2,6 +2,14 @@
 #define LOGIN
 #include "globals.h"
 #include "limits.h"
+#include <stdint.h>
+#include "parser.h"
+#include "md5.h"
+#include "globals.h"
+#include <stdio.h>
+#include <string.h>
+#include "lnklist.h"
+#include "curriculum.h"
 typedef struct UserInfo
 {
     char username[MAX_LEN];
@@ -17,11 +25,13 @@ typedef enum UserType
     TEACHER    // 0x80000001-0xFFFFFFFF
 } UserType;
 
-// int login();
-// int checkLogin(char *username, char *password);
+uint32_t uid2subid(uint32_t uid);
+bool isAdmin(uint32_t userid);
+bool isAnonymous(uint32_t userid);
+bool isRoot(uint32_t userid);
+bool isStudent(uint32_t userid);
+bool isTeacher(uint32_t userid);
 
-// int createLogin();
-// int createUser(char *username, char *password);
 int initUserProfile();
 int getUserInfo();
 int login();

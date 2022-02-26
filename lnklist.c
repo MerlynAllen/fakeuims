@@ -3,18 +3,23 @@ Dual Linked List
 */
 #include "lnklist.h"
 
-DLnklist *dnodeInit(void *data)
+DLnklist *makeDLinkedList()
 {
-    DNode *head = calloc(1, sizeof(DNode));
-    head->data = data;
-    head->next = NULL;
-    head->prev = NULL;
     DLnklist *dlist = calloc(1, sizeof(DLnklist));
-    dlist->head = head;
-    dlist->tail = head;
-    dlist->ptr = head;
-    dlist->count = 1;
+    dlist->head = NULL;
+    dlist->tail = NULL;
+    dlist->ptr = NULL;
+    dlist->count = 0;
     return dlist;
+}
+
+int initDLinkedList(DLnklist *dlist)
+{
+    dlist->head = NULL;
+    dlist->tail = NULL;
+    dlist->ptr = NULL;
+    dlist->count = 0;
+    return 0;
 }
 
 int appendNode(DLnklist *ll, void *data)
@@ -30,6 +35,16 @@ int insNode(DLnklist *ll, void *data) // insert after ptr
 {
     DNode *node = calloc(1, sizeof(DNode));
     node->data = data; // for other functions to fill in
+    if (ll->count == 0)
+    {
+        node->next = NULL;
+        node->prev = NULL;
+        ll->head = node;
+        ll->tail = node;
+        ll->ptr = node;
+        ll->count++;
+        return ll->count;
+    }
     node->next = ll->ptr->next;
     node->prev = ll->ptr;
     if (ll->ptr != ll->tail)
@@ -76,10 +91,21 @@ int delNode(DLnklist *ll)
     ll->ptr = next;
 }
 
+int moveNext(DLnklist *ll)
+{
+    if (ll->ptr->next != NULL)
+    {
+        ll->ptr = ll->ptr->next;
+        return 0;
+    }
+    return -1;
+}
+
 int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data)
 {
     ll->ptr = ll->head;
-    for (; !criterion(ll->ptr->data, data); ll->ptr = ll->ptr->next)
+    for (; !criterion(ll->ptr->data, data); moveNext(ll))
+        ;
     {
         if (ll->ptr == ll->tail) // end of list
         {
@@ -103,7 +129,7 @@ int clearList(DLnklist *ll)
     ll->tail = NULL;
     ll->ptr = NULL;
     ll->count = 0;
-    free(ll);
+    // free(ll);
     return 0;
 }
 
