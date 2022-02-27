@@ -40,4 +40,5 @@ int createAdmin();
 int createUser();
 void fillUserInfo(UserInfo *user, char *name, uint32_t uid, uint8_t hash[MD5_LEN]);
 int saveLoginInfo();
+int listUsers();
 #endif

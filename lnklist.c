@@ -24,11 +24,19 @@ int initDLinkedList(DLnklist *dlist)
 
 int appendNode(DLnklist *ll, void *data)
 {
-    DNode *tmp = ll->ptr;
-    ll->ptr = ll->tail;
-    insNode(ll, data);
-    ll->ptr = tmp;
-    return ll->count;
+    if (ll->count != 0)
+    {
+        DNode *tmp = ll->ptr;
+        ll->ptr = ll->tail;
+        insNode(ll, data);
+        ll->ptr = tmp;
+        return ll->count;
+    }
+    else
+    {
+        insNode(ll, data);
+        return ll->count;
+    }
 }
 
 int insNode(DLnklist *ll, void *data) // insert after ptr
@@ -103,9 +111,12 @@ int moveNext(DLnklist *ll)
 
 int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data)
 {
+    if (ll->ptr == NULL)
+    {
+        return 1; // eroor of empty list
+    }
     ll->ptr = ll->head;
     for (; !criterion(ll->ptr->data, data); moveNext(ll))
-        ;
     {
         if (ll->ptr == ll->tail) // end of list
         {

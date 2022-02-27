@@ -4,22 +4,27 @@ bool isTeacher(uint32_t userid)
 {
     return (userid & 0x80000000) >> 31;
 }
+
 bool isStudent(uint32_t userid)
 {
     return !isTeacher(userid);
 }
+
 bool isRoot(uint32_t userid)
 {
     return userid == 1;
 }
+
 bool isAdmin(uint32_t userid)
 {
     return ((userid & 0x40000000) >> 30) || isRoot(userid);
 }
+
 bool isAnonymous(uint32_t userid)
 {
     return userid == 0;
 }
+
 uint32_t uid2subid(uint32_t uid)
 {
     return uid & 0x0FFFFFFF;
@@ -102,23 +107,6 @@ int getUserInfo()
     return 0;
 }
 
-int login() // main login function
-{
-    int fail_count = 0;
-    printf("Username: ");
-    char username[MAX_LEN] = {0};
-    char password[MAX_LEN] = {0};
-    int i;
-    for (i = 0; i < MAX_LEN && isChars(username[i] = getchar(), ALNUM); i++)
-        ;
-    username[i] = '\0';
-    printf("Password: ");
-    for (i = 0; i < MAX_LEN && isChars(password[i] = getchar(), ALNUM); i++)
-        ;
-    password[i] = '\0';
-    checkLogin(username, password);
-}
-
 int loginHash(char *username, char *password, char hash[MD5_LEN]) // generates md5 from username and password
 {
     int un_len, pw_len = 0;
@@ -170,12 +158,14 @@ int checkLogin(char *username, char *password)
     }
     //
 }
+
 void fillUserInfo(UserInfo *user, char *name, uint32_t uid, uint8_t hash[MD5_LEN])
 {
     strcpy(user->username, name);
     user->userid = uid;
     memcpy(user->hash, hash, MD5_LEN);
 }
+
 int createLogin(char *username, char *password, uint32_t uid) // avability check passed, add user to linked list (RAM bot not file)
 {
     char md5sum[MD5_LEN] = {0};
@@ -209,13 +199,13 @@ int createAccount(bool admin)
         char password[MAX_LEN] = {0};
         char password_confirm[MAX_LEN] = {0};
         printf("Username: ");
-        int i;
         readline(username, MAX_LEN);
         if (strlen(username) < 5 && strlen(username) > 20)
         {
             printf("Username must be between 5 and 20 characters.\n");
             goto retry;
         }
+        int i;
         for (i = 0; i < strlen(username); i++)
         {
             if (!isChars(username[i], ALNUM))
@@ -277,7 +267,7 @@ int createAccount(bool admin)
         while (getchar() != '\n') // Clear stdin
             ;
         printf("Creating user...\n");
-        uid = (sub_id & 0x0FFFFFFF) | (is_student << 31) | (admin << 30);
+        uid = (sub_id & 0x0FFFFFFF) | (!is_student << 31) | (admin << 30);
         if (is_student)
         {
             addStudent(username, sub_id);
@@ -304,6 +294,7 @@ int createAccount(bool admin)
         }
     }
 }
+
 int createAdmin()
 {
     if (isAdmin(USERID))
@@ -344,4 +335,33 @@ int saveLoginInfo() // save to a new file
 
     USERLIST->ptr = curr;
     fclose(fp_pwd);
+}
+
+int login() // main login function
+{
+    int fail_count = 0;
+    printf("Username: ");
+    char username[MAX_LEN] = {0};
+    char password[MAX_LEN] = {0};
+    int i;
+    for (i = 0; i < MAX_LEN && isChars(username[i] = getchar(), ALNUM); i++)
+        ;
+    username[i] = '\0';
+    printf("Password: ");
+    for (i = 0; i < MAX_LEN && isChars(password[i] = getchar(), ALNUM); i++)
+        ;
+    password[i] = '\0';
+    checkLogin(username, password);
+}
+
+int listUsers()
+{
+    DNode *curr = USERLIST->ptr;
+    USERLIST->ptr = USERLIST->head;
+    for (; USERLIST->ptr != NULL; USERLIST->ptr = USERLIST->ptr->next)
+    {
+        UserInfo *data = (UserInfo *)USERLIST->ptr->data;
+        printf("%s %d\n", data->username, data->userid);
+    }
+    USERLIST->ptr = curr;
 }

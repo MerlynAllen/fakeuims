@@ -48,6 +48,7 @@ int parseArgs(char *argv[MAX_ARGC], char *str)
 int terminate(int errno)
 {
     saveLoginInfo();
+    saveData();
     clearList(USERLIST);
     USERLIST = NULL;
     exit(errno);

@@ -70,5 +70,21 @@ int addRoom(char *name, uint32_t capacity);
 int addStudent(char *name, uint32_t studentid);
 int addTeacher(char *name, uint32_t teacherid);
 int enroll(uint32_t userid, uint32_t courseid);
+int courseRegister(uint32_t userid, uint32_t courseid);
 
+int userEnroll();
+int userAddRoom();
+int userCourseRegister();
+int userAddCourse();
+
+int listRooms();
+int saveData();
+
+int listRooms();
+int listCourses();
+int listTeachers();
+int listStudents();
+int showStudentInfo(uint32_t studentid);
+int showCourseInfo(uint32_t courseid);
+int showTeacherInfo(uint32_t teacherid);
 #endif

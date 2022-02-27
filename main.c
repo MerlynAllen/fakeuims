@@ -50,6 +50,7 @@ int interactiveShell()
     strcpy(USERNAME, "anonymous");
     // init userlist
     initData();
+    loadData();
     if (getUserInfo() == -1)
     {
         initUserProfile();
@@ -81,13 +82,103 @@ int interactiveShell()
                 printf("Bye!\n");
                 break;
             }
-            else if (checkArgs(argv[0], 1, "adduser"))
+            else if (checkArgs(argv[0], 1, "add"))
             {
-                createUser();
+                if (checkArgs(argv[1], 1, "user"))
+                {
+                    createUser();
+                }
+                else if (checkArgs(argv[1], 1, "admin"))
+                {
+                    createAdmin();
+                }
+                else if (checkArgs(argv[1], 1, "course"))
+                {
+                    userAddCourse();
+                }
+                else if (checkArgs(argv[1], 1, "room"))
+                {
+                    userAddRoom();
+                }
+                else
+                {
+                    printf("Unknown subcommand %s\n", argv[1]);
+                }
             }
-            else if (checkArgs(argv[0], 1, "addadmin"))
+            else if (checkArgs(argv[0], 1, "list"))
             {
-                createAdmin();
+                if (checkArgs(argv[1], 1, "user"))
+                {
+                    listUsers();
+                }
+                else if (checkArgs(argv[1], 1, "course"))
+                {
+                    listCourses();
+                }
+                else if (checkArgs(argv[1], 1, "teacher"))
+                {
+                    listTeachers();
+                }
+                else if (checkArgs(argv[1], 1, "student"))
+                {
+                    listStudents();
+                }
+                else if (checkArgs(argv[1], 1, "room"))
+                {
+                    listRooms();
+                }
+                else
+                {
+                    printf("Unknown subcommand %s\n", argv[1]);
+                }
+            }
+            else if (checkArgs(argv[0], 1, "show"))
+            {
+                if (checkArgs(argv[1], 1, "student"))
+                {
+                    if (argc == 3)
+                    {
+                        showStudentInfo(atoi(argv[2]));
+                    }
+                    else
+                    {
+                        printf("Expected argc 3, but got %d\n", argc);
+                    }
+                }
+                else if (checkArgs(argv[1], 1, "course"))
+                {
+                    if (argc == 3)
+                    {
+                        showCourseInfo(atoi(argv[2]));
+                    }
+                    else
+                    {
+                        printf("Expected argc 3, but got %d\n", argc);
+                    }
+                }
+                else if (checkArgs(argv[1], 1, "teacher"))
+                {
+                    if (argc == 3)
+                    {
+                        showTeacherInfo(atoi(argv[2]));
+                    }
+                    else
+                    {
+                        printf("Expected argc 3, but got %d\n", argc);
+                    }
+                }
+                else
+                {
+                    printf("Unknown subcommand %s\n", argv[1]);
+                }
+            }
+            else if (checkArgs(argv[0], 1, "enroll"))
+            {
+                userEnroll();
+            }
+            else if (checkArgs(argv[0], 1, "register"))
+            {
+                userCourseRegister();
             }
             else
             {
