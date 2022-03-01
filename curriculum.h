@@ -40,7 +40,7 @@ typedef struct Course
     uint32_t courseid;
     char name[MAX_LEN];
     char description[MAX_LEN];
-    uint32_t credits;
+    float credits;
     DLnklist teachers; // teachers
     uint32_t capacity;
     DLnklist enrollment; // students

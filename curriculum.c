@@ -49,6 +49,89 @@ bool checkStudentid(void *data, void *studentid)
     return student->studentid == id;
 }
 
+bool cmpStudentName(void *a, void *b)
+{
+    Student *s1 = (Student *)a;
+    Student *s2 = (Student *)b;
+    return strcmp(s1->name, s2->name) > 0;
+}
+
+bool cmpStudentId(void *a, void *b)
+{
+    Student *s1 = (Student *)a;
+    Student *s2 = (Student *)b;
+    return s1->studentid > s2->studentid;
+}
+
+bool cmpCourseName(void *a, void *b)
+{
+    Course *c1 = (Course *)a;
+    Course *c2 = (Course *)b;
+    return strcmp(c1->name, c2->name) > 0;
+}
+
+bool cmpCourseId(void *a, void *b)
+{
+    Course *c1 = (Course *)a;
+    Course *c2 = (Course *)b;
+    return c1->courseid > c2->courseid;
+}
+
+int userSort(char *data, char *field)
+{
+    if (strcmp(data, "user") == 0)
+    {
+        if (strcmp(field, "name") == 0)
+        {
+            nodeqsort(STUDENTS, cmpStudentName);
+        }
+        else if (strcmp(field, "id") == 0)
+        {
+            nodeqsort(STUDENTS, cmpStudentId);
+        }
+    }
+    else if (strcmp(data, "course") == 0)
+    {
+        if (strcmp(field, "name") == 0)
+        {
+            nodeqsort(COURSES, cmpCourseName);
+        }
+        else if (strcmp(field, "id") == 0)
+        {
+            nodeqsort(COURSES, );
+        }
+        else if (strcmp(field, "credit") == 0)
+        {
+        }
+        else if (strcmp(field, "capacity") == 0)
+        {
+        }
+        else if (strcmp(field, "time") == 0)
+        {
+        }
+        else if (strcmp(field, "room") == 0)
+        {
+        }
+    }
+    else if (strcmp(data, "room") == 0)
+    {
+        // sort by room
+        if (strcmp(field, "name") == 0)
+        {
+        }
+        else if (strcmp(field, "id") == 0)
+        {
+        }
+        else if (strcmp(field, "capacity") == 0)
+        {
+        }
+    }
+    return 0;
+nodataerr:
+    printf("No such data: %s\n", data);
+    return -1;
+}
+
 int initData()
 {
     TEACHERS = makeDLinkedList();

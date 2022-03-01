@@ -144,6 +144,51 @@ int clearList(DLnklist *ll)
     return 0;
 }
 
+int nodeqsort(DLnklist *ll, bool (*criterion)(void *, void *))
+{
+    if (ll == NULL || ll->count == 0)
+    {
+        return -1;
+    }
+    qsortcore(ll->head, ll->tail, criterion);
+    return 0;
+}
+int swapNode(DNode *a, DNode *b)
+{
+    if (a != b)
+    {
+
+        void *tmp = a->data;
+        a->data = b->data;
+        b->data = tmp;
+    }
+    return 0;
+}
+int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *))
+{
+    if (head == tail)
+    {
+        return 0;
+    }
+    DNode *left = head;
+    DNode *right = tail;
+    while (left != right)
+    {
+        if (criterion(left->data, left->next->data))
+        {
+            swapNode(left, left->next);
+            left = left->next;
+        }
+        else
+        {
+            swapNode(left->next, right);
+            right = right->prev;
+        }
+    }
+    qsortcore(head, left, criterion);
+    qsortcore(left->next, tail, criterion);
+    return 0;
+}
 // UserInfo *makeUser(char *username, uint32_t userid, char hash[MD5_LEN])
 // {
 //     UserInfo *user = calloc(1, sizeof(UserInfo));
