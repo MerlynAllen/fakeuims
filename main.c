@@ -71,7 +71,14 @@ int interactiveShell()
             if (checkArgs(argv[0], 1, "login"))
             {
                 // login
-                login();
+                if (argc == 2)
+                {
+                    login(argv[1]);
+                }
+                else
+                {
+                    login(NULL);
+                }
             }
             else if (checkArgs(argv[0], 2, "help", "?"))
             {
@@ -179,6 +186,35 @@ int interactiveShell()
             else if (checkArgs(argv[0], 1, "register"))
             {
                 userCourseRegister();
+            }
+            else if (checkArgs(argv[0], 1, "sort"))
+            {
+                if (argc == 4 || argc == 6 && strcmp(argv[2], "by") == 0)
+                {
+                    bool reverse = false;
+                    if (argc == 4 || (argc == 6 && checkArgs(argv[4], 1, "reverse") && checkArgs(argv[5], 1, "false")))
+                    {
+                        reverse = false;
+                    }
+                    else if (argc == 6 && checkArgs(argv[4], 1, "reverse") && checkArgs(argv[5], 1, "true"))
+                    {
+                        reverse = true;
+                    }
+                    else
+                    {
+                        printf("Expected syntax: sort [data] by [field_name] (reverse [is_reverse]).\n");
+                    }
+                    userSort(argv[1], argv[3], reverse);
+                }
+                else
+                {
+                    printf("Expected syntax: sort [data] by [field_name] (reverse [is_reverse]).\n");
+                }
+            }
+            else if (checkArgs(argv[0], 1, "save"))
+            {
+                saveData();
+                saveLoginInfo();
             }
             else
             {

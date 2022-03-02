@@ -64,8 +64,9 @@ typedef struct Student
 
 int initData();
 int loadData();
+int userSort(char *data, char *field, bool reverse);
 
-int addCourse(char *name, char *description, uint32_t credits, uint32_t capacity, CTime time, uint32_t roomid);
+int addCourse(char *name, char *description, float credits, uint32_t capacity, CTime time, uint32_t roomid);
 int addRoom(char *name, uint32_t capacity);
 int addStudent(char *name, uint32_t studentid);
 int addTeacher(char *name, uint32_t teacherid);

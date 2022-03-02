@@ -1,4 +1,5 @@
 #include "login.h"
+#include "getpwd.h"
 
 bool isTeacher(uint32_t userid)
 {
@@ -297,20 +298,28 @@ int createAccount(bool admin)
 
 int createAdmin()
 {
-    if (isAdmin(USERID))
+    if (isRoot(USERID))
     {
 
         createAccount(true);
     }
     else
     {
-        printf("You are not an admin.\n");
+        printf("You are not superuser.\n");
     }
 }
 
 int createUser()
 {
-    createAccount(false);
+    if (isAdmin(USERID))
+    {
+
+        createAccount(false);
+    }
+    else
+    {
+        printf("You are not an admin.\n");
+    }
 }
 
 int saveLoginInfo() // save to a new file
@@ -337,31 +346,72 @@ int saveLoginInfo() // save to a new file
     fclose(fp_pwd);
 }
 
-int login() // main login function
+int login(char *username) // main login function
 {
-    int fail_count = 0;
-    printf("Username: ");
-    char username[MAX_LEN] = {0};
-    char password[MAX_LEN] = {0};
-    int i;
-    for (i = 0; i < MAX_LEN && isChars(username[i] = getchar(), ALNUM); i++)
-        ;
-    username[i] = '\0';
-    printf("Password: ");
-    for (i = 0; i < MAX_LEN && isChars(password[i] = getchar(), ALNUM); i++)
-        ;
-    password[i] = '\0';
-    checkLogin(username, password);
+    if (USERID == 0)
+    {
+        int fail_count = 0;
+        bool allocate = false;
+        for (int fail_count = 0; fail_count < MAX_TRAILS; fail_count++)
+        {
+            if (username == NULL)
+            {
+                printf("Username: ");
+                username = calloc(sizeof(char), MAX_LEN);
+                allocate = true;
+                // char password[MAX_LEN] = {0};
+                int i;
+                for (i = 0; i < MAX_LEN && isChars(username[i] = getchar(), ALNUM); i++)
+                    ;
+                username[i] = '\0';
+            }
+            printf("Password: ");
+            // for (i = 0; i < MAX_LEN && isChars(password[i] = getchar(), ALNUM); i++)
+            //     ;
+            // password[i] = '\0';
+            char *password = NULL;
+            getpasswd(&password, MAX_LEN, '*', stdin);
+            printf("\n");
+            checkLogin(username, password);
+            free(password);
+            if (allocate) // restore
+            {
+                free(username);
+                username = NULL;
+            }
+            return 0;
+        }
+        printf("Too many failed login attempts.\n");
+        return -1;
+    }
+    else
+    {
+        printf("You are already logged in.\n");
+    }
+}
+
+int logout()
+{
+    USERID = 0;
+    printf("Logged out.\n");
 }
 
 int listUsers()
 {
-    DNode *curr = USERLIST->ptr;
-    USERLIST->ptr = USERLIST->head;
-    for (; USERLIST->ptr != NULL; USERLIST->ptr = USERLIST->ptr->next)
+    if (isAdmin(USERID))
     {
-        UserInfo *data = (UserInfo *)USERLIST->ptr->data;
-        printf("%s %d\n", data->username, data->userid);
+
+        DNode *curr = USERLIST->ptr;
+        USERLIST->ptr = USERLIST->head;
+        for (; USERLIST->ptr != NULL; USERLIST->ptr = USERLIST->ptr->next)
+        {
+            UserInfo *data = (UserInfo *)USERLIST->ptr->data;
+            printf("%s %d\n", data->username, data->userid);
+        }
+        USERLIST->ptr = curr;
     }
-    USERLIST->ptr = curr;
+    else
+    {
+        printf("You are not an admin.\n");
+    }
 }

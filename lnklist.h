@@ -30,7 +30,7 @@ int insHeadNode(DLnklist *ll, void *data);
 int moveNext(DLnklist *ll);
 int delNode(DLnklist *ll);
 int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data);
-int nodeqsort(DLnklist *ll, bool (*criterion)(void *, void *));
-int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *));
+int nodeqsort(DLnklist *ll, bool (*criterion)(void *, void *), bool reverse);
+int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *), bool reverse);
 int clearList(DLnklist *ll);
 #endif

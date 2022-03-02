@@ -113,17 +113,17 @@ int seekNode(DLnklist *ll, bool (*criterion)(void *, void *), void *data)
 {
     if (ll->ptr == NULL)
     {
-        return 1; // eroor of empty list
+        return 1; // error of empty list
     }
     ll->ptr = ll->head;
     for (; !criterion(ll->ptr->data, data); moveNext(ll))
     {
         if (ll->ptr == ll->tail) // end of list
         {
-            return -1;
+            return -1; // not found
         }
     }
-    return 0;
+    return 0; // found
 }
 
 int clearList(DLnklist *ll)
@@ -144,13 +144,13 @@ int clearList(DLnklist *ll)
     return 0;
 }
 
-int nodeqsort(DLnklist *ll, bool (*criterion)(void *, void *))
+int nodeqsort(DLnklist *ll, bool (*criterion)(void *, void *), bool reverse)
 {
     if (ll == NULL || ll->count == 0)
     {
         return -1;
     }
-    qsortcore(ll->head, ll->tail, criterion);
+    qsortcore(ll->head, ll->tail, criterion, reverse);
     return 0;
 }
 int swapNode(DNode *a, DNode *b)
@@ -164,7 +164,7 @@ int swapNode(DNode *a, DNode *b)
     }
     return 0;
 }
-int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *))
+int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *), bool reverse)
 {
     if (head == tail)
     {
@@ -174,7 +174,7 @@ int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *))
     DNode *right = tail;
     while (left != right)
     {
-        if (criterion(left->data, left->next->data))
+        if (reverse ^ criterion(left->data, left->next->data))
         {
             swapNode(left, left->next);
             left = left->next;
@@ -185,8 +185,11 @@ int qsortcore(DNode *head, DNode *tail, bool (*criterion)(void *, void *))
             right = right->prev;
         }
     }
-    qsortcore(head, left, criterion);
-    qsortcore(left->next, tail, criterion);
+    qsortcore(head, left, criterion, reverse);
+    if (left != tail)
+    {
+        qsortcore(left->next, tail, criterion, reverse);
+    }
     return 0;
 }
 // UserInfo *makeUser(char *username, uint32_t userid, char hash[MD5_LEN])

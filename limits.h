@@ -5,5 +5,6 @@
 #define MAX_ARGC 16
 #define MD5_LEN 16
 #define MAX_TEACHERS 4
+#define MAX_TRAILS 4
 
 #endif

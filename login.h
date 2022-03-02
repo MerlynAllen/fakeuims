@@ -34,7 +34,7 @@ bool isTeacher(uint32_t userid);
 
 int initUserProfile();
 int getUserInfo();
-int login();
+int login(char *username);
 int loginHash(char *username, char *password, char hash[MD5_LEN]);
 int createAdmin();
 int createUser();

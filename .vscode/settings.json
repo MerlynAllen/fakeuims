@@ -3,6 +3,7 @@
         "ctype.h": "c",
         "md5.h": "c",
         "string.h": "c",
-        "limits.h": "c"
+        "limits.h": "c",
+        "termios.h": "c"
     }
 }
