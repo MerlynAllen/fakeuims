@@ -392,8 +392,17 @@ int login(char *username) // main login function
 
 int logout()
 {
-    USERID = 0;
-    printf("Logged out.\n");
+    if (USERID != 0)
+    {
+        USERID = 0;
+        strcpy(USERNAME, "anonymous");
+        printf("Logged out.\n");
+    }
+    else
+    {
+        printf("You are not logged in.\n");
+    }
+    return 0;
 }
 
 int listUsers()

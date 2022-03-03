@@ -216,6 +216,10 @@ int interactiveShell()
                 saveData();
                 saveLoginInfo();
             }
+            else if (checkArgs(argv[0], 1, "logout"))
+            {
+                logout();
+            }
             else
             {
                 printf("Unknown command: %s\n", argv[0]);
