@@ -116,13 +116,8 @@ int loginHash(char *username, char *password, char hash[MD5_LEN]) // generates m
     uint8_t buf[MD5_LEN] = {0};
     strcpy(buf, username);
     strcpy(buf + un_len, ":");
-    strcpy(buf + un_len + 1, password);
-    md5(buf, strlen(buf), hash);
-    // for (int i = 0; i < 16; i++)
-    // {
-    //     printf("%02x ", checksum[i]);
-    // }
-    // printf("\n");
+    strcpy(buf + un_len + 1, password); // Concatenate username and password
+    md5(buf, strlen(buf), hash);        // calculate md5sum
 }
 
 bool usernameMatch(void *data, void *username)

@@ -6,14 +6,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef struct DNode
+typedef struct DNode // linked list node
 {
     void *data;
     struct DNode *next;
     struct DNode *prev;
 } DNode;
 
-typedef struct DLnklist
+typedef struct DLnklist // save information of a linked list
 {
     DNode *head;
     DNode *tail;

@@ -2,6 +2,39 @@ Usage: eduadmin [Options] [Command args ...]
 Options:
     -h, --help
         Print this help message.
-    -v, --version
-        Print version information.
-哼哼啊啊啊啊啊啊啊啊啊
+Interactive shell commands:
+    help, ?
+        Show this help message.
+
+    quit, exit
+        Save data and quit.
+    
+    add [user|admin|course|room]
+        Add new records.
+
+    list [user|course|teacher|student|room]
+        Show all records of users, courses, teachers, students and rooms.
+    
+    show [student|course|teacher]
+        Show more detailed information for specified UID.
+    
+    enroll
+        Enrool to a course. Only students are able to use this command.
+    
+    disenroll
+        Disnrool to a course. Only students are able to use this command.
+    
+    register
+        Register to a course. Only teachers can use this command.
+    
+    sort [user|course|room] by [name|id|credit|capacity]
+        Sort records by specified field name.
+    
+    me
+        Show the detailed information for user currently logged in. Only students can use this command.
+    
+    save
+        Manually save all records and user information.
+    
+    logout
+        Logout from user currently logged in to user "anonymous".
