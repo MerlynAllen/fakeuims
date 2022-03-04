@@ -3,12 +3,12 @@
 
 bool isTeacher(uint32_t userid)
 {
-    return (userid & 0x80000000) >> 31;
+    return ((userid & 0x80000000) >> 31) && (!isAnonymous(userid));
 }
 
 bool isStudent(uint32_t userid)
 {
-    return !isTeacher(userid);
+    return (~(userid & 0x80000000) >> 31) && (!isAnonymous(userid));
 }
 
 bool isRoot(uint32_t userid)
@@ -264,7 +264,7 @@ int createAccount(bool admin)
             printf("Invalid account type.\n");
             goto retry;
         }
-        scanf("%d", &sub_id);
+        scanf("%u", &sub_id);
         while (getchar() != '\n') // Clear stdin
             ;
         printf("Creating user...\n");
@@ -415,7 +415,7 @@ int listUsers()
         for (; USERLIST->ptr != NULL; USERLIST->ptr = USERLIST->ptr->next)
         {
             UserInfo *data = (UserInfo *)USERLIST->ptr->data;
-            printf("%s %d\n", data->username, data->userid);
+            printf("%s %u\n", data->username, data->userid);
         }
         USERLIST->ptr = curr;
     }

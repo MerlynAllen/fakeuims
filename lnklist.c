@@ -34,6 +34,7 @@ int appendNode(DLnklist *ll, void *data)
     }
     else
     {
+        ll->ptr = ll->tail;
         insNode(ll, data);
         return ll->count;
     }
@@ -62,12 +63,14 @@ int insNode(DLnklist *ll, void *data) // insert after ptr
     else // nullptr -> tail
     {
         ll->tail = node;
+        // printf("%p\n", ll->ptr->data);
     }
     ll->ptr->next = node;
     ll->ptr = node;
     ll->count++;
     return ll->count;
 }
+
 int insHeadNode(DLnklist *ll, void *data)
 {
 

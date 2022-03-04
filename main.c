@@ -50,11 +50,11 @@ int interactiveShell()
     strcpy(USERNAME, "anonymous");
     // init userlist
     initData();
-    loadData();
     if (getUserInfo() == -1)
     {
         initUserProfile();
     }
+    loadData();
     while (true)
     {
         printf("[%s]> ", USERNAME);
@@ -149,7 +149,7 @@ int interactiveShell()
                     }
                     else
                     {
-                        printf("Expected argc 3, but got %d\n", argc);
+                        printf("Expected argc 3, but got %u\n", argc);
                     }
                 }
                 else if (checkArgs(argv[1], 1, "course"))
@@ -160,7 +160,7 @@ int interactiveShell()
                     }
                     else
                     {
-                        printf("Expected argc 3, but got %d\n", argc);
+                        printf("Expected argc 3, but got %u\n", argc);
                     }
                 }
                 else if (checkArgs(argv[1], 1, "teacher"))
@@ -171,7 +171,7 @@ int interactiveShell()
                     }
                     else
                     {
-                        printf("Expected argc 3, but got %d\n", argc);
+                        printf("Expected argc 3, but got %u\n", argc);
                     }
                 }
                 else
@@ -210,6 +210,14 @@ int interactiveShell()
                 {
                     printf("Expected syntax: sort [data] by [field_name] (reverse [is_reverse]).\n");
                 }
+            }
+            else if (checkArgs(argv[0], 1, "disenroll"))
+            {
+                userDisenroll();
+            }
+            else if (checkArgs(argv[0], 1, "me"))
+            {
+                me();
             }
             else if (checkArgs(argv[0], 1, "save"))
             {

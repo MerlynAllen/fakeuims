@@ -66,14 +66,16 @@ int initData();
 int loadData();
 int userSort(char *data, char *field, bool reverse);
 
-int addCourse(char *name, char *description, float credits, uint32_t capacity, CTime time, uint32_t roomid);
+int addCourse(char name[MAX_LEN], char description[MAX_LEN], uint32_t courseid, float credits, uint32_t capacity, CTime time, uint32_t roomid);
 int addRoom(char *name, uint32_t capacity);
 int addStudent(char *name, uint32_t studentid);
 int addTeacher(char *name, uint32_t teacherid);
 int enroll(uint32_t userid, uint32_t courseid);
+int disenroll(uint32_t studentid, uint32_t courseid);
 int courseRegister(uint32_t userid, uint32_t courseid);
 
 int userEnroll();
+int userDisenroll();
 int userAddRoom();
 int userCourseRegister();
 int userAddCourse();
@@ -88,4 +90,5 @@ int listStudents();
 int showStudentInfo(uint32_t studentid);
 int showCourseInfo(uint32_t courseid);
 int showTeacherInfo(uint32_t teacherid);
+int me();
 #endif
